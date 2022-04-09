@@ -85,6 +85,7 @@ def main(argv):
         return
 
     collected_df=pd.DataFrame() # create empty data dataframe
+    collected_start_df=pd.DataFrame() # create empty data dataframe
 
     writer = pd.ExcelWriter('experiments.xlsx', engine='xlsxwriter')
 
@@ -126,9 +127,16 @@ def main(argv):
                     intervals_df[ncn]=float(val)
             collected_df=collected_df.append(intervals_df)
             name_for_sheet=file_name.replace("_", " ")[len(dir_name)+1:-5]
+
+            start_data=dict_of_json['start']
+            start_df=pd.json_normalize(start_data)
+            start_df['run name']=name_for_sheet
+            collected_start_df=collected_start_df.append(start_df)
+
             intervals_df.to_excel(writer, sheet_name=name_for_sheet)
 
     collected_df.to_excel(writer, sheet_name='All')
+    collected_start_df.to_excel(writer, sheet_name='Starting')
 
     # Close the Pandas Excel writer and output the Excel file.
     writer.save()
